@@ -29,11 +29,20 @@ public class Main {
 
         // @TODO pruebe sus funciones
 
-        //nuevo_dragon("Viseryon", 1, 1);
+        nuevo_dragon("Viseryon", 1, 1);
 
         squad_derrota_dragones("Hooligans de la sangre").forEach(System.out::println);
 
-        conn.close();
+        mostrar_hachas("Forja del enano risueño").forEach(System.out::println);
+
+        try {
+            if(conn != null)
+                conn.close();
+        }
+        catch(SQLException e) {
+            // connection close failed.
+            System.err.println(e.getMessage());
+        }
     }
 
     // @TODO resuelva las siguientes funciones...
@@ -50,16 +59,6 @@ public class Main {
         }
         catch (SQLException e) {
             System.err.println(e.getMessage());
-        }
-        finally {
-            try {
-                if(conn != null)
-                    conn.close();
-            }
-            catch(SQLException e) {
-                // connection close failed.
-                System.err.println(e.getMessage());
-            }
         }
     }
 
@@ -79,16 +78,6 @@ public class Main {
         catch (SQLException e) {
             System.err.println(e.getMessage());
         }
-        finally {
-            try {
-                if(conn != null)
-                    conn.close();
-            }
-            catch(SQLException e) {
-                // connection close failed.
-                System.err.println(e.getMessage());
-            }
-        }
         return lista;
     }
 
@@ -97,6 +86,18 @@ public class Main {
         // Tenga en cuenta que la consulta a la base de datos le devolverá un ResultSet sobre el que deberá
         // ir iterando y creando un objeto con cada hacha disponible en esa forja, y añadirlos a la lista
         List<Hacha> lista = new ArrayList<>();
+
+        try {
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM hacha INNER JOIN mejora_hacha ON hacha.nombre_h = mejora_hacha.nombre_h WHERE mejora_hacha.nombre_f = ?");
+            statement.setString(1, nombre_forja);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                lista.add(new Hacha(resultSet.getString("nombre_h"), resultSet.getInt("peso"), resultSet.getInt("daño")));
+            }
+        }
+        catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
         return lista;
     }
 
