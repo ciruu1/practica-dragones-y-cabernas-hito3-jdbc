@@ -33,7 +33,13 @@ public class Main {
 
         squad_derrota_dragones("Hooligans de la sangre").forEach(System.out::println);
 
+        System.out.println("------------------------------------");
+
         mostrar_hachas("Forja del enano risueño").forEach(System.out::println);
+
+        System.out.println("------------------------------------");
+
+        System.out.println(espada_porta_guerrero("Stanto"));
 
         try {
             if(conn != null)
@@ -103,6 +109,17 @@ public class Main {
 
     public static String espada_porta_guerrero(String nombre_guerrero){
         // @TODO: complete este método para que devuelva el nombre de la espada que porta el guerrero "nombre_guerrero"
+        try {
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM tiene_espada INNER JOIN guerrero ON tiene_espada.id_g = guerrero.id_g WHERE guerrero.nombre_p = ?");
+            statement.setString(1, nombre_guerrero);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                return resultSet.getString("nombre_e");
+            }
+        }
+        catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
         return "espadón";
     }
 
