@@ -1,20 +1,20 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import game.model.Dragon;
+import game.model.*;
 
 public class Main {
     // @TODO: Sustituya xxxx por los parámetros de su conexión
 
-    private static final String DB_SERVER = "xxxx";
+    private static final String DB_SERVER = "localhost";
 
-    private static final int DB_PORT = xxxx;
+    private static final int DB_PORT = 3306;
 
-    private static final String DB_NAME = "xxxx";
+    private static final String DB_NAME = "dragonesycavernas";
 
-    private static final String DB_USER = "xxxx";
+    private static final String DB_USER = "root";
 
-    private static final String DB_PASS = "xxxx";
+    private static final String DB_PASS = "";
 
     private static Connection conn;
 
@@ -29,22 +29,66 @@ public class Main {
 
         // @TODO pruebe sus funciones
 
+        //nuevo_dragon("Viseryon", 1, 1);
 
+        squad_derrota_dragones("Hooligans de la sangre").forEach(System.out::println);
 
         conn.close();
     }
 
     // @TODO resuelva las siguientes funciones...
 
-    public static void nuevo_dragon(String nombre){
+    public static void nuevo_dragon(String nombre, int vida, int recompensa){
         // @TODO: complete este método para que cree un nuevo dragón en la base de datos
-
+        try {
+            String sql = "INSERT INTO dragon(nombre_dr,vida,recompensa) VALUES(?,?,?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, nombre);
+            pstmt.setInt(2, vida);
+            pstmt.setInt(3, recompensa);
+            pstmt.executeUpdate();
+        }
+        catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        finally {
+            try {
+                if(conn != null)
+                    conn.close();
+            }
+            catch(SQLException e) {
+                // connection close failed.
+                System.err.println(e.getMessage());
+            }
+        }
     }
 
-    public static List<Dragon> squad_derrota_dragones(Long id_squad){
+    public static List<Dragon> squad_derrota_dragones(String squad){
         // @TODO: complete este método para que devuelva una lista de los dragones derrotados por el squad
         // Tenga en cuenta que la consulta a la base de datos le devolverá un ResultSet sobre el que deberá
         // ir iterando y creando un objeto dragon para cada uno de los dragones, y añadirlos a la lista
+        List<Dragon> lista = new ArrayList<>();
+        try {
+            PreparedStatement statement2 = conn.prepareStatement("SELECT * FROM dragon INNER JOIN lucha ON dragon.nombre_dr = lucha.nombre_dr WHERE lucha.nombre_esc = ?");
+            statement2.setString(1, squad);
+            ResultSet rsDragon = statement2.executeQuery();
+            while (rsDragon.next()) {
+                lista.add(new Dragon(rsDragon.getString("nombre_dr"), rsDragon.getInt("vida"), rsDragon.getInt("recompensa")));
+            }
+        }
+        catch (SQLException e) {
+            System.err.println(e.getMessage());
+        }
+        finally {
+            try {
+                if(conn != null)
+                    conn.close();
+            }
+            catch(SQLException e) {
+                // connection close failed.
+                System.err.println(e.getMessage());
+            }
+        }
         return lista;
     }
 
@@ -52,6 +96,7 @@ public class Main {
         // @TODO: complete este método para que muestre por pantalla las hachas que pueden forjarse en "nombre_forja"
         // Tenga en cuenta que la consulta a la base de datos le devolverá un ResultSet sobre el que deberá
         // ir iterando y creando un objeto con cada hacha disponible en esa forja, y añadirlos a la lista
+        List<Hacha> lista = new ArrayList<>();
         return lista;
     }
 
