@@ -29,7 +29,7 @@ public class Main {
 
         // @TODO pruebe sus funciones
 
-        nuevo_dragon("Viseryon", 1, 1);
+        nuevo_dragon("Viseryon", 1, 1, "Dehiss");
 
         squad_derrota_dragones("Hooligans de la sangre").forEach(System.out::println);
 
@@ -53,14 +53,15 @@ public class Main {
 
     // @TODO resuelva las siguientes funciones...
 
-    public static void nuevo_dragon(String nombre, int vida, int recompensa){
+    public static void nuevo_dragon(String nombre, int vida, int recompensa, String nuevoDragon){
         // @TODO: complete este método para que cree un nuevo dragón en la base de datos
         try {
-            String sql = "INSERT INTO dragon(nombre_dr,vida,recompensa) VALUES(?,?,?)";
+            String sql = "INSERT INTO dragon(nombre_dr,vida,recompensa,dr_desbloqueado) VALUES(?,?,?,?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, nombre);
             pstmt.setInt(2, vida);
             pstmt.setInt(3, recompensa);
+            pstmt.setString(4, nuevoDragon);
             pstmt.executeUpdate();
         }
         catch (SQLException e) {
